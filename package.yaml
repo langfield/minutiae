@@ -7,7 +7,7 @@ maintainer:          "example@example.com"
 copyright:           "2022 Author name here"
 
 extra-source-files:
-- README.md
+- README
 - ChangeLog.md
 
 # Metadata used when publishing your package
@@ -23,6 +23,7 @@ dependencies:
 - base >= 4.7 && < 5
 - gogol-core >= 0.5.0
 - gogol-sheets >= 0.5.0
+- gogol-examples >= 0.5.0
 
 library:
   source-dirs: src

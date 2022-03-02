@@ -46,7 +46,10 @@ extra-deps:
     commit: 2d3d9319b1a57c4a0a565637102d74420bcb6a0f
     subdirs:
       - core
+      - gogol
       - gogol-sheets
+      - gogol-storage
+      - examples
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
