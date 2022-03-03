@@ -5,6 +5,13 @@
 
 packages:
 - completed:
+    hackage: optparse-applicative-0.17.0.0@sha256:0713e54cbb341e5cae979e2ac441eb3a5ff42e303001f432bd58c19e5638bdda,4967
+    pantry-tree:
+      size: 3124
+      sha256: 3b4398845ee6718fe2303870a5ab75bd190eb712fed2f22caaae30f790c490fd
+  original:
+    hackage: optparse-applicative-0.17.0.0
+- completed:
     size: 17725780
     subdir: core
     url: https://github.com/brendanhay/gogol/archive/2d3d9319b1a57c4a0a565637102d74420bcb6a0f.tar.gz

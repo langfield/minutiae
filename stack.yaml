@@ -42,6 +42,7 @@ packages:
 #
 # extra-deps: []
 extra-deps:
+  - optparse-applicative-0.17.0.0
   - github: brendanhay/gogol
     commit: 2d3d9319b1a57c4a0a565637102d74420bcb6a0f
     subdirs:

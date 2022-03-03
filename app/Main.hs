@@ -30,7 +30,6 @@ sample = Sample
          <> value 1
          <> metavar "INT" )
 
-{-
 main :: IO ()
 main = greet =<< execParser opts
   where
@@ -39,13 +38,15 @@ main = greet =<< execParser opts
      <> progDesc "Print a greeting for TARGET"
      <> header "hello - a test for optparse-applicative" )
 
+-- We pattern match on an object of type ``Sample``, where ``h`` is the
+-- parameter for the ``hello`` field, and ``n`` is the parameter for the
+-- ``enthusiasm`` parameter. Note that we specify that the ``quiet`` fields
+-- must have the value ``False``. If we do not match on this first pattern, we
+-- simply return without doing anything.
 greet :: Sample -> IO ()
-greet (Sample h False n) = putStrLn $ "Hello, " ++ h ++ replicate n '!'
-greet _ = return ()
- -}
-
-main :: IO ()
-main = do
+greet (Sample h False n) = do
+    putStrLn $ "Hello, " ++ h ++ replicate n '!'
     putStrLn "Downloading sheet."
     ss <- exampleGetSheet "0"
     putStrLn "Downloaded sheet."
+greet _ = return ()
