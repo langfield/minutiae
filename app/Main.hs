@@ -1,10 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Main where
 
 import Lib
 
+import Data.Data
 import Data.List
 import Data.Semigroup ((<>))
 import Data.Text
@@ -54,6 +56,20 @@ data Block =
     , mins :: Int
     , time :: UTCTime
     }
+  deriving (Data, Typeable)
+
+parseBlock :: [JSONValue] -> Block
+parseBlock blockList
+  | Data.List.length blockList /= 6 = error "Bad."
+  | otherwise =
+    Block
+      { title = parseJSON (blockList !! 0) :: String
+      , completion = 0.5
+      , weight = 0.5
+      , actualMins = 1
+      , mins = 1
+      , time = UTCTime (fromGregorian 2021 03 05) (secondsToDiffTime 0)
+      }
 
 -- We pattern match on an object of type ``Args``, where ``id`` is the
 -- parameter for the ``id`` field.
@@ -66,6 +82,11 @@ demo (Args id) = do
   let jsonValueArray :: [[JSONValue]] = valueRange ^. vrValues
   print (typeOf jsonValueArray)
   let row = jsonValueArray !! 0
+  let block = parseBlock row
+  let bLen =
+        Prelude.map constrFields . dataTypeConstrs . dataTypeOf $
+        (undefined :: Block)
+  print (typeOf bLen)
   pPrint row
   print (typeOf row)
 -- If we don't match on first pattern, we simply return.
