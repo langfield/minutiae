@@ -6,6 +6,7 @@ module Main where
 import Lib
 
 import Data.Text
+import Data.Time
 import Data.List
 import Data.Typeable
 import Data.Semigroup ((<>))
@@ -40,17 +41,23 @@ main = demo =<< execParser opts
      <> progDesc "Download a Google sheet."
      <> header "diurnal - a scheduling system." )
 
+data Block = Block {title :: String, completion :: Float, weight :: Float, actualMins :: Int, mins :: Int, time :: UTCTime}
+
 -- We pattern match on an object of type ``Args``, where ``id`` is the
 -- parameter for the ``id`` field.
 demo :: Args -> IO ()
 demo (Args id) = do
     putStrLn $ "Downloading sheet:" ++ id
+
+    -- Get the first day only, for now.
     valueRange <- exampleGetValue (pack id) "A2:G75"
     print (typeOf valueRange)
     let jsonValueArray :: [[JSONValue]] = valueRange ^. vrValues
-    let columns :: [[JSONValue]] = Data.List.transpose jsonValueArray
-    pPrint columns
-    print (typeOf columns)
+    print (typeOf jsonValueArray)
+
+    let row = jsonValueArray !! 0
+    pPrint row
+    print (typeOf row)
 
 -- If we don't match on first pattern, we simply return.
 demo _ = return ()

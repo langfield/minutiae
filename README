@@ -16,7 +16,30 @@ ground truth at a configurable, infrequent interval.
 
 Specification
 =============
-1.  Fetches data from Google sheet.
-2.  Sends scheduled blocks to a Dart frontend.
-3.  Receives completion data and actual blocks from frontend.
-4.  Updates Gooogle sheet with received data.
+- Fetches data from Google sheet.
+- Sends scheduled blocks to a Dart frontend.
+    - Sends:
+        - Title
+        - Weight
+        - Minutes
+        - Start time (in case frontend loses connection)
+- Receives actual blocks from frontend (serves as completion data).
+- Updates Gooogle sheet with received data.
+- Set timezone.
+
+
+Won't fix
+=========
+- No support for adding/editing/deleting scheduled blocks from frontend.
+- No support for recording actual blocks with an endtime in the future.
+
+
+Undecided
+=========
+Should data flowing frontend -> backend be free-form text, or options selected
+from a predefined list? The first allows more expressivity, and therefore a
+possibly better record of activities, but the second makes the data entry
+process shorter, which is paramount.
+
+Should the user be able to edit past actual block data? Yes, this should be as
+accurate as possible, and allowing revisions is important.
