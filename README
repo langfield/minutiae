@@ -1,0 +1,22 @@
++-------+
+|diurnal|
++-------+
+
+
+Description
+===========
+Diurnal is a program for parsing Google sheets schedule data and forwarding
+entries to a Dart frontend.
+
+It is intended to be run continuously as a daemon on a (possibly low-resource)
+server. It maintains an internal queue of messages/entries to be forwarded at
+specified times, and fetches updates to this queue from a remote source of
+ground truth at a configurable, infrequent interval.
+
+
+Specification
+=============
+1.  Fetches data from Google sheet.
+2.  Sends scheduled blocks to a Dart frontend.
+3.  Receives completion data and actual blocks from frontend.
+4.  Updates Gooogle sheet with received data.

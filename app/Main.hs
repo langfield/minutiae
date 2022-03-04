@@ -4,16 +4,23 @@
 module Main where
 
 import Lib
+
 import Data.Text
+import Data.List
 import Data.Typeable
+import Data.Semigroup ((<>))
+
 import Control.Lens
-import Text.Pretty.Simple
 
 import Example.Sheets
-import Network.Google.Sheets
+
+import Text.Pretty.Simple
 
 import Options.Applicative
-import Data.Semigroup ((<>))
+
+import Network.Google.Sheets
+import Network.Google.Prelude
+
 
 newtype Args = Args {id :: String}
 
@@ -38,9 +45,12 @@ main = demo =<< execParser opts
 demo :: Args -> IO ()
 demo (Args id) = do
     putStrLn $ "Downloading sheet:" ++ id
-    valueRange <- exampleGetValue (pack id) "A1:A2"
+    valueRange <- exampleGetValue (pack id) "A2:G75"
     print (typeOf valueRange)
-    pPrint valueRange
+    let jsonValueArray :: [[JSONValue]] = valueRange ^. vrValues
+    let columns :: [[JSONValue]] = Data.List.transpose jsonValueArray
+    pPrint columns
+    print (typeOf columns)
 
 -- If we don't match on first pattern, we simply return.
 demo _ = return ()
