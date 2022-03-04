@@ -1,10 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Main where
 
 import Lib
 import Data.Text
+import Data.Typeable
+import Control.Lens
+import Text.Pretty.Simple
+
 import Example.Sheets
+import Network.Google.Sheets
 
 import Options.Applicative
 import Data.Semigroup ((<>))
@@ -36,5 +42,27 @@ greet :: Sample -> IO ()
 greet (Sample id) = do
     putStrLn $ "Downloading sheet:" ++ id
     ss <- exampleGetSheet $ pack id
+
+    let sheets :: [Sheet] = view sprSheets ss
+    putStrLn $ show $ typeOf sheets
+    putStrLn $ show $ Prelude.length sheets
+
+    let sheet = sheets !! 1
+    pPrint sheet
+
+    -- let formats = sheet ^. sConditionalFormats
+    -- putStrLn $ show $ formats
+
+    -- let rowGroups = sheet ^. sRowGroups
+    -- putStrLn $ show $ rowGroups
+
+    -- let sdata = sheet ^. sData
+    -- putStrLn $ show $ sdata
+    -- putStrLn $ show $ typeOf sdata
+
+    -- let grid = sdata !! 0
+    -- putStrLn $ show $ grid
+    -- putStrLn $ show $ typeOf grid
+
     putStrLn "Downloaded sheet."
 greet _ = return ()
