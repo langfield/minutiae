@@ -8,12 +8,10 @@ import Lib
 
 import Data.Aeson
 import Data.Aeson.Types
-import Data.ByteString.Lazy.UTF8
 import Data.Data
-import Data.List
 import Data.Scientific
 import Data.Semigroup ((<>))
-import Data.Text
+import Data.Text (pack, unpack)
 import Data.Time
 import Data.Typeable
 
@@ -25,7 +23,7 @@ import Text.Pretty.Simple
 
 import Options.Applicative
 
-import Network.Google.Prelude
+import Network.Google.Prelude (JSONValue)
 import Network.Google.Sheets
 
 newtype Args =
@@ -87,17 +85,16 @@ data Block =
 -- Get number of fields in ``Block``.
 getBlockLength :: Int
 getBlockLength =
-  Prelude.length $
-  Prelude.head $
-  Prelude.map constrFields . dataTypeConstrs . dataTypeOf $ (undefined :: Block)
+  length $
+  head $ map constrFields . dataTypeConstrs . dataTypeOf $ (undefined :: Block)
 
 parseBlock :: [JSONValue] -> Day -> Block
 parseBlock blockList day
-  | Data.List.length blockList /= getBlockLength =
+  | length blockList /= getBlockLength =
     error "Number of columns in block is wrong!"
   | otherwise =
     Block
-      { title = jsonValueToString $ Prelude.head blockList :: Maybe String
+      { title = jsonValueToString $ head blockList :: Maybe String
       , completion = jsonStringValueToFloat (blockList !! 1) :: Maybe Float
       , weight = jsonStringValueToFloat (blockList !! 2) :: Maybe Float
       , actualMins = jsonStringValueToInt (blockList !! 3) :: Maybe Int
@@ -118,7 +115,7 @@ demo (Args id) = do
   -- Get the first day only, for now.
   valueRange <- exampleGetValue (pack id) "A2:G75"
   let jsonValueArray :: [[JSONValue]] = valueRange ^. vrValues
-  let row = Prelude.head jsonValueArray
+  let row = head jsonValueArray
   let day = getDay row
   let block = parseBlock row day
   pPrint block
