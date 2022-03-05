@@ -8,7 +8,9 @@ import Lib
 
 import Data.Aeson
 import Data.Aeson.Types
-import Data.Data
+import Data.Data (Data, gmapQ, constrFields, dataTypeOf, dataTypeConstrs)
+import Data.Generics.Aliases (ext1Q)
+import Data.Maybe (isNothing, fromJust)
 import Data.Scientific
 import Data.Semigroup ((<>))
 import Data.Text (pack, unpack)
@@ -72,13 +74,13 @@ parseJSONClockTime _ _ = Nothing
 
 data Block =
   Block
-    { title :: Maybe String
-    , completion :: Maybe Float
-    , weight :: Maybe Float
-    , actualMins :: Maybe Int
-    , mins :: Maybe Int
-    , late :: Maybe Int
-    , time :: Maybe UTCTime
+    { title :: String
+    , completion :: Float
+    , weight :: Float
+    , actualMins :: Int
+    , mins :: Int
+    , late :: Int
+    , time :: UTCTime
     }
   deriving (Data, Typeable, Show)
 
@@ -88,20 +90,40 @@ getBlockLength =
   length $
   head $ map constrFields . dataTypeConstrs . dataTypeOf $ (undefined :: Block)
 
-parseBlock :: [JSONValue] -> Day -> Block
+-- Check if there are any ``Nothing`` values in a ``Block`` instance.
+anyNothing :: (Data d) => d -> Bool
+anyNothing = or . gmapQ (const False `ext1Q` isNothing)
+
+parseBlock :: [JSONValue] -> Day -> Maybe Block
 parseBlock blockList day
   | length blockList /= getBlockLength =
     error "Number of columns in block is wrong!"
+  | isNothing title = Nothing
+  | isNothing completion = Nothing
+  | isNothing weight = Nothing
+  | isNothing actualMins = Nothing
+  | isNothing mins = Nothing
+  | isNothing late = Nothing
+  | isNothing time = Nothing
   | otherwise =
-    Block
-      { title = jsonValueToString $ head blockList :: Maybe String
-      , completion = jsonStringValueToFloat (blockList !! 1) :: Maybe Float
-      , weight = jsonStringValueToFloat (blockList !! 2) :: Maybe Float
-      , actualMins = jsonStringValueToInt (blockList !! 3) :: Maybe Int
-      , mins = jsonStringValueToInt (blockList !! 4) :: Maybe Int
-      , late = jsonStringValueToInt (blockList !! 5) :: Maybe Int
-      , time = parseJSONClockTime (blockList !! 6) day :: Maybe UTCTime
-      }
+    Just
+      Block
+        { title = fromJust title
+        , completion = fromJust completion
+        , weight = fromJust weight
+        , actualMins = fromJust actualMins
+        , mins = fromJust mins
+        , late = fromJust late
+        , time = fromJust time
+        }
+  where
+    title = jsonValueToString $ head blockList :: Maybe String
+    completion = jsonStringValueToFloat (blockList !! 1) :: Maybe Float
+    weight = jsonStringValueToFloat (blockList !! 2) :: Maybe Float
+    actualMins = jsonStringValueToInt (blockList !! 3) :: Maybe Int
+    mins = jsonStringValueToInt (blockList !! 4) :: Maybe Int
+    late = jsonStringValueToInt (blockList !! 5) :: Maybe Int
+    time = parseJSONClockTime (blockList !! 6) day :: Maybe UTCTime
 
 -- Dummy function until we actually implement this.
 getDay :: [JSONValue] -> Day
@@ -117,7 +139,7 @@ demo (Args id) = do
   let jsonValueArray :: [[JSONValue]] = valueRange ^. vrValues
   let row = head jsonValueArray
   let day = getDay row
-  let block = parseBlock row day
+  let block :: Maybe Block = parseBlock row day
   pPrint block
 -- If we don't match on first pattern, we simply return.
 demo _ = return ()
