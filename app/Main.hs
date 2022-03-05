@@ -64,10 +64,6 @@ jsonStringValueToFloat :: Value -> Maybe Float
 jsonStringValueToFloat (String s) = Just (read (unpack s) :: Float)
 jsonStringValueToFloat _ = Nothing
 
-jsonValueToUTCTime :: Value -> Maybe UTCTime
-jsonValueToUTCTime (String s) = Just (read (unpack s) :: UTCTime)
-jsonValueToUTCTime _ = Nothing
-
 parseJSONClockTime :: Value -> Day -> Maybe UTCTime
 parseJSONClockTime (String s) day =
   Just
