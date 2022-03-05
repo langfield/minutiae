@@ -90,11 +90,10 @@ data Block =
 
 -- Get number of fields in ``Block``.
 getBlockLength :: Int
-getBlockLength = 
-        Prelude.length $
-        Prelude.head $
-        Prelude.map constrFields . dataTypeConstrs . dataTypeOf $
-        (undefined :: Block)
+getBlockLength =
+  Prelude.length $
+  Prelude.head $
+  Prelude.map constrFields . dataTypeConstrs . dataTypeOf $ (undefined :: Block)
 
 parseBlock :: [JSONValue] -> Day -> Block
 parseBlock blockList day
@@ -102,7 +101,7 @@ parseBlock blockList day
     error "Number of columns in block is wrong!"
   | otherwise =
     Block
-      { title = jsonValueToString (blockList !! 0) :: Maybe String
+      { title = jsonValueToString $ Prelude.head blockList :: Maybe String
       , completion = jsonStringValueToFloat (blockList !! 1) :: Maybe Float
       , weight = jsonStringValueToFloat (blockList !! 2) :: Maybe Float
       , actualMins = jsonStringValueToInt (blockList !! 3) :: Maybe Int
@@ -120,14 +119,12 @@ getDay _ = fromGregorian 2022 03 06
 demo :: Args -> IO ()
 demo (Args id) = do
   putStrLn $ "Downloading sheet:" ++ id
-
-    -- Get the first day only, for now.
+  -- Get the first day only, for now.
   valueRange <- exampleGetValue (pack id) "A2:G75"
   let jsonValueArray :: [[JSONValue]] = valueRange ^. vrValues
-  let row = jsonValueArray !! 0
+  let row = Prelude.head jsonValueArray
   let day = getDay row
   let block = parseBlock row day
   pPrint block
-
 -- If we don't match on first pattern, we simply return.
 demo _ = return ()
