@@ -10,7 +10,7 @@ import Data.Aeson
 import Data.Aeson.Types
 import Data.Data (Data, gmapQ, constrFields, dataTypeOf, dataTypeConstrs)
 import Data.Generics.Aliases (ext1Q)
-import Data.Maybe (isNothing, fromJust)
+import Data.Maybe (isNothing, fromJust, catMaybes)
 import Data.Scientific
 import Data.Semigroup ((<>))
 import Data.Text (pack, unpack)
@@ -64,6 +64,7 @@ jsonStringValueToFloat :: Value -> Maybe Float
 jsonStringValueToFloat (String s) = Just (read (unpack s) :: Float)
 jsonStringValueToFloat _ = Nothing
 
+-- TODO: Fix this so it doesn't error-out.
 parseJSONClockTime :: Value -> Day -> Maybe UTCTime
 parseJSONClockTime (String s) day =
   Just
@@ -94,8 +95,9 @@ getBlockLength =
 anyNothing :: (Data d) => d -> Bool
 anyNothing = or . gmapQ (const False `ext1Q` isNothing)
 
-parseBlock :: [JSONValue] -> Day -> Maybe Block
-parseBlock blockList day
+-- Parse a block from a fixed-length list of JSONValues.
+parseBlock :: Day -> [JSONValue] -> Maybe Block
+parseBlock day blockList
   | length blockList /= getBlockLength =
     error "Number of columns in block is wrong!"
   | isNothing title = Nothing
@@ -126,7 +128,7 @@ parseBlock blockList day
     time = parseJSONClockTime (blockList !! 6) day :: Maybe UTCTime
 
 -- Dummy function until we actually implement this.
-getDay :: [JSONValue] -> Day
+getDay :: [[JSONValue]] -> Day
 getDay _ = fromGregorian 2022 03 06
 
 -- We pattern match on an object of type ``Args``, where ``id`` is the
@@ -136,10 +138,10 @@ demo (Args id) = do
   putStrLn $ "Downloading sheet:" ++ id
   -- Get the first day only, for now.
   valueRange <- exampleGetValue (pack id) "A2:G75"
-  let jsonValueArray :: [[JSONValue]] = valueRange ^. vrValues
-  let row = head jsonValueArray
-  let day = getDay row
-  let block :: Maybe Block = parseBlock row day
-  pPrint block
+  let rows :: [[JSONValue]] = valueRange ^. vrValues
+  let day = getDay rows
+  let blocks = catMaybes $ map (parseBlock day) rows
+  -- print blocks
+  putStrLn "Hello"
 -- If we don't match on first pattern, we simply return.
 demo _ = return ()
