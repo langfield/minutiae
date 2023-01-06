@@ -70,7 +70,7 @@ parseJSONClockTime (String s) day =
   Just
     (UTCTime
        day
-       (parseTimeOrError True defaultTimeLocale "%H:%M" (unpack s) :: DiffTime))
+       (parseTimeM True defaultTimeLocale "%H:%M" (unpack s) :: Maybe DiffTime))
 parseJSONClockTime _ _ = Nothing
 
 data Block =
@@ -141,7 +141,6 @@ demo (Args id) = do
   let rows :: [[JSONValue]] = valueRange ^. vrValues
   let day = getDay rows
   let blocks = catMaybes $ map (parseBlock day) rows
+
   -- print blocks
-  putStrLn "Hello"
--- If we don't match on first pattern, we simply return.
-demo _ = return ()
+  putStrLn $ show blocks
